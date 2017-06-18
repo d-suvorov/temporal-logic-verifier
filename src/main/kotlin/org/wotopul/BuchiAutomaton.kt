@@ -265,8 +265,19 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
         val from = nodesByStateId[automatonTransitionStart.id]!!.second
         val to = nodesByStateId[automatonTransitionEnd.id]!!.first
 
-        var transitionStart = from
         val eventVariable = Variable(transition.event)
+        val stateVariable = Variable(from.name)
+        val eventLabel = Label(setOf(stateVariable, eventVariable))
+        val eventTransitionEnd: Node
+        if (transition.actions.isEmpty()) {
+            eventTransitionEnd = to
+        } else {
+            eventTransitionEnd = Node("temp_${transition.event}")
+            states.add(eventTransitionEnd)
+        }
+        addTransition(delta, from, eventLabel, eventTransitionEnd)
+
+        var transitionStart = eventTransitionEnd
         for ((i, action) in transition.actions.withIndex()) {
             val actionVariable = Variable(action)
             val transitionEnd: Node
@@ -277,7 +288,7 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
                 states.add(transitionEnd)
             }
             val label = Label(setOf(
-                Variable(from.name),
+                stateVariable,
                 eventVariable,
                 actionVariable
             ))
