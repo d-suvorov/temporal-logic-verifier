@@ -208,11 +208,11 @@ sealed class LtlFormula {
     }
 
     fun closure(): Set<LtlFormula> {
-        val res = mutableSetOf<LtlFormula>()
+        val res = mutableSetOf<LtlFormula>(False, True)
 
         fun closureImpl(f: LtlFormula) {
             res.add(f)
-            res.add(neg(f))
+            res.add(toNNF(neg(f)))
             when (f) {
                 is Not -> closureImpl(f.sub)
                 is And -> {
@@ -237,8 +237,7 @@ sealed class LtlFormula {
             }
         }
 
-        res.add(False)
-        res.add(True)
+        closureImpl(this)
         return res
     }
 

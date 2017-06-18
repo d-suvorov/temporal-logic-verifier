@@ -44,8 +44,11 @@ fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula): GeneralizedLab
         else -> throw AssertionError("curr2 of $f is undefined")
     }
 
-    val init = Node()
+    val init = Node("init")
     val nodes: MutableList<Node> = mutableListOf()
+
+    var nodeId = 0
+    fun freshNodeName() = "node_{${++nodeId}}"
 
     fun expand(curr: Set<LtlFormula>, old: Set<LtlFormula>, next: Set<LtlFormula>, incoming: Set<Node>) {
         if (curr.isEmpty()) {
@@ -54,12 +57,12 @@ fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula): GeneralizedLab
                 r.incoming.addAll(incoming)
                 return
             } else {
-                val q = Node()
+                val q = Node(freshNodeName())
                 nodes.add(q)
                 q.incoming.addAll(incoming)
                 q.now.addAll(old)
                 q.next.addAll(next)
-                expand(q.next, mutableSetOf(), emptySet(), setOf(q))
+                expand(q.next, emptySet(), emptySet(), setOf(q))
             }
         } else {
             val f: LtlFormula = curr.first()
@@ -87,16 +90,16 @@ fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula): GeneralizedLab
                 expand(nCurr, nOld, next + f.sub, incoming)
             } else if (f is Or || f is Until || f is Release) {
                 val curr1 = nCurr + (curr1(f) - nOld)
-                expand(curr1.toMutableSet(), nOld, next + next1(f), incoming)
+                expand(curr1, nOld, next + next1(f), incoming)
                 val curr2 = nCurr + (curr2(f) - nOld)
-                expand(curr2.toMutableSet(), nOld, next, incoming)
+                expand(curr2, nOld, next, incoming)
             } else {
                 throw AssertionError("not in negative normal form")
             }
         }
     }
 
-    expand(mutableSetOf(ltlFormula), mutableSetOf(), emptySet(), setOf(init))
+    expand(mutableSetOf(ltlFormula), emptySet(), emptySet(), setOf(init))
 
     return GeneralizedLabeledBuchiAutomaton(ltlFormula, nodes, init)
 }
@@ -120,6 +123,8 @@ fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>, 
     val delta = mutableMapOf<Node, List<Node>>()
     for (node in nodes) {
         for (from in node.incoming) {
+            if (from == init)
+                continue
             delta.merge(from, listOf(node), { t, u -> t + u })
         }
     }

@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
     val debugMode = if (args.size == 3) args[2].toBoolean() else false
 
     val automaton = Automaton.readAutomatonFromFile(automatonFile)
-    val ltlFormula = parseLtlFormula(formula)
+    val ltlFormula = LtlFormula.Not(parseLtlFormula(formula))
 
     val buchiAutomaton = BuchiAutomaton(automaton)
     val generalizedBuchiAutomatonByLtl = GeneralizedLabeledBuchiAutomaton(ltlFormula)
