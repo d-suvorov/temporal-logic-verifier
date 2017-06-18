@@ -7,7 +7,9 @@ open class Node(
     val incoming: MutableSet<Node> = mutableSetOf(),
     val now: MutableSet<LtlFormula> = mutableSetOf(),
     val next: MutableSet<LtlFormula> = mutableSetOf()
-)
+) {
+    override fun toString() = "State(name=$name)"
+}
 
 class GeneralizedLabeledBuchiAutomaton(
     val states: List<Node>,
@@ -141,7 +143,28 @@ class BuchiAutomaton(
     val start: Set<Node>,
     val finish: Set<Node>,
     val delta: Map<Node, Map<Label, List<Node>>>
-)
+) {
+    override fun toString(): String {
+        val sb = StringBuilder("BuchiAutomaton:\n")
+        with (sb) {
+            append("Sigma:\n")
+            sigma.forEach { append(it); append(", ") }
+            append("\nStates:\n")
+            states.forEach { append(it); append(", ") }
+            append("\nStart:\n")
+            start.forEach { append(it); append(", ") }
+            append("\nFinish:\n")
+            finish.forEach { append(it); append(", ") }
+            append("\nTransitions:\n")
+            for ((from, transition) in delta) {
+                for ((symbol, to) in transition) {
+                    append("$from -> $symbol -> $to\n")
+                }
+            }
+        }
+        return sb.toString()
+    }
+}
 
 fun addTransition(delta: MutableMap<Node, MutableMap<Label, MutableList<Node>>>,
                   start: Node, label: Label, end: Node)

@@ -23,6 +23,7 @@ sealed class LtlFormula {
         }
     }
 
+    // TODO clean up this mess
     class Not(val sub: LtlFormula) : LtlFormula() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -239,6 +240,20 @@ sealed class LtlFormula {
         res.add(False)
         res.add(True)
         return res
+    }
+
+    override fun toString() = when (this) {
+        False -> "false"
+        True -> "true"
+        is Variable -> name
+        is Not -> "!($sub)"
+        is And -> "($lhs && $rhs)"
+        is Or -> "($lhs || $rhs)"
+        is Next -> "N ($sub)"
+        is Future -> "F ($sub)"
+        is Globally -> "G ($sub)"
+        is Until -> "($lhs U $rhs)"
+        is Release -> "($lhs R $rhs)"
     }
 }
 
