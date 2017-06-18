@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
     val ltlFormula = LtlFormula.Not(parseLtlFormula(formula))
 
     val buchiAutomaton = BuchiAutomaton(automaton)
-    val generalizedBuchiAutomatonByLtl = GeneralizedLabeledBuchiAutomaton(ltlFormula)
+    val generalizedBuchiAutomatonByLtl = GeneralizedLabeledBuchiAutomaton(ltlFormula, buchiAutomaton.sigma)
     val buchiAutomatonByLtl = BuchiAutomaton(generalizedBuchiAutomatonByLtl)
 
     if (debugMode) {

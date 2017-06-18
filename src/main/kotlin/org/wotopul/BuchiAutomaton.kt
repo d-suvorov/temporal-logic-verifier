@@ -12,6 +12,7 @@ open class Node(
 }
 
 class GeneralizedLabeledBuchiAutomaton(
+    val sigma: Set<String>,
     val states: List<Node>,
     val labels: Map<Node, Label>,
     val delta: Map<Node, List<Node>>,
@@ -19,10 +20,12 @@ class GeneralizedLabeledBuchiAutomaton(
     val finish: List<Set<Node>>
 )
 
-fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula) =
-    GeneralizedLabeledBuchiAutomatonImpl(toNNF(ltlFormula))
+fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, sigma: Set<String>) =
+    GeneralizedLabeledBuchiAutomatonImpl(toNNF(ltlFormula), sigma)
 
-fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula): GeneralizedLabeledBuchiAutomaton {
+fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula, sigma: Set<String>):
+    GeneralizedLabeledBuchiAutomaton
+{
     fun curr1(f: LtlFormula): Set<LtlFormula> = when (f) {
         is Until -> setOf(f.lhs)
         is Release -> setOf(f.rhs)
@@ -101,15 +104,15 @@ fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula): GeneralizedLab
 
     expand(mutableSetOf(ltlFormula), emptySet(), emptySet(), setOf(init))
 
-    return GeneralizedLabeledBuchiAutomaton(ltlFormula, nodes, init)
+    return GeneralizedLabeledBuchiAutomaton(ltlFormula, nodes, init, sigma)
 }
 
-fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>, init: Node):
+fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>, init: Node, sigma: Set<String>):
     GeneralizedLabeledBuchiAutomaton
 {
     val states = nodes
 
-    val atomPropositions = ltlFormula.atomPropositions()
+    val atomPropositions = sigma.map { Variable(it) }
     val labels = mutableMapOf<Node, Label>()
     for (node in nodes) {
         val min = node.now intersect atomPropositions
@@ -139,7 +142,7 @@ fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>, 
         finish.add(Fg)
     }
 
-    return GeneralizedLabeledBuchiAutomaton(states, labels, delta, start, finish)
+    return GeneralizedLabeledBuchiAutomaton(sigma, states, labels, delta, start, finish)
 }
 
 class BuchiAutomaton(
@@ -185,7 +188,6 @@ fun BuchiAutomaton(glba: GeneralizedLabeledBuchiAutomaton): BuchiAutomaton {
         val n: Int
     ) : Node(node.name, node.incoming, node.now, node.next)
 
-    val sigma = mutableSetOf<String>()
     val nodes = mutableSetOf<Node>()
     val start = mutableSetOf<Node>()
     val finish = mutableSetOf<Node>()
@@ -223,7 +225,7 @@ fun BuchiAutomaton(glba: GeneralizedLabeledBuchiAutomaton): BuchiAutomaton {
         }
     }
 
-    return BuchiAutomaton(sigma, nodes, start, finish, delta)
+    return BuchiAutomaton(glba.sigma, nodes, start, finish, delta)
 }
 
 fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
