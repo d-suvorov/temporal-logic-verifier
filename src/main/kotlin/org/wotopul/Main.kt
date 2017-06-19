@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
     | <formula>   - LTL-formula
     """.trimMargin()
     if (args.size !in 2 .. 3) {
-        print(usage)
+        println(usage)
         System.exit(0)
     }
 
