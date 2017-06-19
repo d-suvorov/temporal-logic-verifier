@@ -40,10 +40,11 @@ fun main(args: Array<String>) {
     } else {
         println("Formula $formula does not hold")
         println("Counter-example path:")
-        for (label in answer.path!!) {
+        for ((i, label) in answer.path!!.withIndex()) {
             assert(label.min == label.max)
-            println(label.min)
+            println("$i :\t${label.min}")
         }
+        println("Back to ${answer.cycleStartIndex!!} and it's a cycle")
     }
 }
 

@@ -1,9 +1,14 @@
 package org.wotopul
 
-class Answer(val holds: Boolean, val path: List<Label>?)
+class Answer(
+    val holds: Boolean,
+    val path: List<Label>? = null,
+    val cycleStartIndex: Int? = null
+)
 
 fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
     // States on a current path of dfs1
+    val path1 = mutableListOf<Pair<Node, Node>>()
     val pathSet1 = mutableSetOf<Pair<Node, Node>>()
     // Transitions on a current path of dfs1
     val transitions1 = mutableListOf<Label>()
@@ -15,6 +20,7 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
 
     var foundPath = false
     var path: List<Label>? = null
+    var cycleStartIndex: Int? = null
 
     // TODO cut'n'paste
     fun dfs2(q: Pair<Node, Node>) {
@@ -34,6 +40,7 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
                             if (to in pathSet1) {
                                 foundPath = true
                                 path = transitions1 + transitions2 + autoTransitionLabel
+                                cycleStartIndex = path1.indexOf(to)
                                 return
                             }
                             if (to !in visited2) {
@@ -52,6 +59,7 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
         if (foundPath)
             return
         pathSet1.add(q)
+        path1.add(q)
         val automatonTransitions = fromAutomaton.delta.getOrDefault(q.first, emptyMap())
         val ltlTransitions = fromLtl.delta.getOrDefault(q.second, emptyMap())
         for (autoTransitionLabel in automatonTransitions.keys) {
@@ -73,8 +81,10 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
             }
         }
         if (q.first in fromAutomaton.finish && q.second in fromLtl.finish) {
+            visited2.clear()
             dfs2(q)
         }
+        path1.removeAt(path1.lastIndex)
         pathSet1.remove(q)
     }
 
@@ -82,9 +92,9 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
         for (q2 in fromLtl.start) {
             dfs1(Pair(q1, q2))
             if (foundPath)
-                return Answer(false, path)
+                return Answer(false, path, cycleStartIndex)
         }
     }
 
-    return Answer(true, null)
+    return Answer(true)
 }
