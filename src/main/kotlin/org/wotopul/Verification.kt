@@ -68,9 +68,9 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
         for (q2 in fromLtl.start) {
             dfs1(Pair(q1, q2))
             if (foundPath)
-                return Answer(true)
+                return Answer(false)
         }
     }
 
-    return Answer(false)
+    return Answer(true)
 }

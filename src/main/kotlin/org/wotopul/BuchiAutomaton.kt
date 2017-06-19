@@ -51,7 +51,7 @@ fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula, sigma: Set<Stri
     val nodes: MutableList<Node> = mutableListOf()
 
     var nodeId = 0
-    fun freshNodeName() = "node_{${++nodeId}}"
+    fun freshNodeName() = "node_${++nodeId}"
 
     fun expand(curr: Set<LtlFormula>, old: Set<LtlFormula>, next: Set<LtlFormula>, incoming: Set<Node>) {
         if (curr.isEmpty()) {
@@ -184,9 +184,33 @@ fun addTransition(delta: MutableMap<Node, MutableMap<Label, MutableList<Node>>>,
 
 fun BuchiAutomaton(glba: GeneralizedLabeledBuchiAutomaton): BuchiAutomaton {
     class CountingNode(
-        node: Node,
+        val node: Node,
         val n: Int
-    ) : Node(node.name, node.incoming, node.now, node.next)
+    )
+        : Node(node.name, node.incoming, node.now, node.next)
+    {
+        override fun toString(): String {
+            return "CountingNode(name=$name, n=$n)"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other?.javaClass != javaClass) return false
+
+            other as CountingNode
+
+            if (node != other.node) return false
+            if (n != other.n) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = node.hashCode()
+            result = 31 * result + n
+            return result
+        }
+    }
 
     val nodes = mutableSetOf<Node>()
     val start = mutableSetOf<Node>()
