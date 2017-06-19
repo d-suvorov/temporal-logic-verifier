@@ -35,10 +35,16 @@ fun main(args: Array<String>) {
     }
 
     val answer = findPath(buchiAutomaton, buchiAutomatonByLtl)
-    if (answer.holds)
+    if (answer.holds) {
         println("Formula $formula holds")
-    else
+    } else {
         println("Formula $formula does not hold")
+        println("Counter-example path:")
+        for (label in answer.path!!) {
+            assert(label.min == label.max)
+            println(label.min)
+        }
+    }
 }
 
 fun parseLtlFormula(input: String): LtlFormula {
