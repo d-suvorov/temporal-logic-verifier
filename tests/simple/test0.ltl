@@ -1,8 +1,5 @@
-F c
-G ((a && go) -> (X b))
-F start
-F a
-F b
-G (a -> (F b))
-a
-G (F c)
+G (JUMP -> (F C))
+G (JUMP -> (F D))
+G (A -> (F B))
+(A || B) U C
+G (C -> (F (A || B)))
