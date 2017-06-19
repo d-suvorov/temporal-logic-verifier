@@ -22,13 +22,20 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
     var path: List<Symbol>? = null
     var cycleStartIndex: Int? = null
 
+    fun constructLoop(state: Node, sigma: Set<String>): Map<Symbol, List<Node>> {
+        val universe = sigma.map { LtlFormula.Variable(it) }.toSet()
+        return mapOf(Symbol(emptySet(), universe) to listOf(state))
+    }
+
     // TODO cut'n'paste
     fun dfs2(q: Pair<Node, Node>) {
         if (foundPath)
             return
         visited2.add(q)
-        val automatonTransitions = fromAutomaton.delta.getOrDefault(q.first, emptyMap())
-        val ltlTransitions = fromLtl.delta.getOrDefault(q.second, emptyMap())
+        val automatonTransitions = fromAutomaton.delta.getOrDefault(
+            q.first, constructLoop(q.first, fromAutomaton.atomPropositions))
+        val ltlTransitions = fromLtl.delta.getOrDefault(
+            q.second, constructLoop(q.second, fromAutomaton.atomPropositions))
         for (autoTransitionLabel in automatonTransitions.keys) {
             for (ltlTransitionLabel in ltlTransitions.keys) {
                 if (autoTransitionLabel subset ltlTransitionLabel) {
@@ -60,8 +67,10 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
             return
         pathSet1.add(q)
         path1.add(q)
-        val automatonTransitions = fromAutomaton.delta.getOrDefault(q.first, emptyMap())
-        val ltlTransitions = fromLtl.delta.getOrDefault(q.second, emptyMap())
+        val automatonTransitions = fromAutomaton.delta.getOrDefault(
+            q.first, constructLoop(q.first, fromAutomaton.atomPropositions))
+        val ltlTransitions = fromLtl.delta.getOrDefault(
+            q.second, constructLoop(q.second, fromAutomaton.atomPropositions))
         for (autoTransitionLabel in automatonTransitions.keys) {
             for (ltlTransitionLabel in ltlTransitions.keys) {
                 if (autoTransitionLabel subset ltlTransitionLabel) {
