@@ -1,11 +1,11 @@
 package org.wotopul
 
-class Label(val min: Set<LtlFormula>, val max: Set<LtlFormula>) {
-    constructor(label: Set<LtlFormula>) : this(label, label)
+class Symbol(val min: Set<LtlFormula>, val max: Set<LtlFormula>) {
+    constructor(minmax: Set<LtlFormula>) : this(minmax, minmax)
     constructor(f: LtlFormula) : this(setOf(f))
 
     override fun toString() = "Symbol: <$min, $max>"
 }
 
-infix fun Label.subset(l: Label) =
+infix fun Symbol.subset(l: Symbol) =
     this.min.containsAll(l.min) && l.max.containsAll(this.max)

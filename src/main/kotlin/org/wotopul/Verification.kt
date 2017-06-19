@@ -2,7 +2,7 @@ package org.wotopul
 
 class Answer(
     val holds: Boolean,
-    val path: List<Label>? = null,
+    val path: List<Symbol>? = null,
     val cycleStartIndex: Int? = null
 )
 
@@ -11,15 +11,15 @@ fun findPath(fromAutomaton: BuchiAutomaton, fromLtl: BuchiAutomaton): Answer {
     val path1 = mutableListOf<Pair<Node, Node>>()
     val pathSet1 = mutableSetOf<Pair<Node, Node>>()
     // Transitions on a current path of dfs1
-    val transitions1 = mutableListOf<Label>()
+    val transitions1 = mutableListOf<Symbol>()
 
     // States visited by dfs2
     val visited2 = mutableSetOf<Pair<Node, Node>>()
     // Transitions on a current path of dfs2
-    val transitions2 = mutableListOf<Label>()
+    val transitions2 = mutableListOf<Symbol>()
 
     var foundPath = false
-    var path: List<Label>? = null
+    var path: List<Symbol>? = null
     var cycleStartIndex: Int? = null
 
     // TODO cut'n'paste

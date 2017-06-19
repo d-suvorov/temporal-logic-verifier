@@ -12,18 +12,18 @@ open class Node(
 }
 
 class GeneralizedLabeledBuchiAutomaton(
-    val sigma: Set<String>,
+    val atomPropositions: Set<String>,
     val states: List<Node>,
-    val labels: Map<Node, Label>,
+    val labels: Map<Node, Symbol>,
     val delta: Map<Node, List<Node>>,
     val start: List<Node>,
     val finish: List<Set<Node>>
 )
 
-fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, sigma: Set<String>) =
-    GeneralizedLabeledBuchiAutomatonImpl(toNNF(ltlFormula), sigma)
+fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, atomPropositions: Set<String>) =
+    GeneralizedLabeledBuchiAutomatonImpl(toNNF(ltlFormula), atomPropositions)
 
-fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula, sigma: Set<String>):
+fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula, atomPropositions: Set<String>):
     GeneralizedLabeledBuchiAutomaton
 {
     fun curr1(f: LtlFormula): Set<LtlFormula> = when (f) {
@@ -104,23 +104,24 @@ fun GeneralizedLabeledBuchiAutomatonImpl(ltlFormula: LtlFormula, sigma: Set<Stri
 
     expand(mutableSetOf(ltlFormula), emptySet(), emptySet(), setOf(init))
 
-    return GeneralizedLabeledBuchiAutomaton(ltlFormula, nodes, init, sigma)
+    return GeneralizedLabeledBuchiAutomaton(ltlFormula, nodes, init, atomPropositions)
 }
 
-fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>, init: Node, sigma: Set<String>):
+fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>,
+                                     init: Node, atomicPropositions: Set<String>):
     GeneralizedLabeledBuchiAutomaton
 {
     val states = nodes
 
-    val atomPropositions = sigma.map { Variable(it) }
-    val labels = mutableMapOf<Node, Label>()
+    val atomPropositions = atomicPropositions.map { Variable(it) }
+    val labels = mutableMapOf<Node, Symbol>()
     for (node in nodes) {
         val min = node.now intersect atomPropositions
         val max = mutableSetOf<LtlFormula>()
         atomPropositions
             .filter { Not(it) !in node.now }
             .forEach { max.add(it) }
-        labels[node] = Label(min, max)
+        labels[node] = Symbol(min, max)
     }
 
     val delta = mutableMapOf<Node, List<Node>>()
@@ -142,21 +143,21 @@ fun GeneralizedLabeledBuchiAutomaton(ltlFormula: LtlFormula, nodes: List<Node>, 
         finish.add(Fg)
     }
 
-    return GeneralizedLabeledBuchiAutomaton(sigma, states, labels, delta, start, finish)
+    return GeneralizedLabeledBuchiAutomaton(atomicPropositions, states, labels, delta, start, finish)
 }
 
 class BuchiAutomaton(
-    val sigma: Set<String>,
+    val atomPropositions: Set<String>,
     val states: Set<Node>,
     val start: Set<Node>,
     val finish: Set<Node>,
-    val delta: Map<Node, Map<Label, List<Node>>>
+    val delta: Map<Node, Map<Symbol, List<Node>>>
 ) {
     override fun toString(): String {
         val sb = StringBuilder("BuchiAutomaton:\n")
         with (sb) {
-            append("Sigma:\n")
-            sigma.forEach { append(it); append(", ") }
+            append("AP:\n")
+            atomPropositions.forEach { append(it); append(", ") }
             append("\nStates:\n")
             states.forEach { append(it); append(", ") }
             append("\nStart:\n")
@@ -174,11 +175,11 @@ class BuchiAutomaton(
     }
 }
 
-fun addTransition(delta: MutableMap<Node, MutableMap<Label, MutableList<Node>>>,
-                  start: Node, label: Label, end: Node)
+fun addTransition(delta: MutableMap<Node, MutableMap<Symbol, MutableList<Node>>>,
+                  start: Node, symbol: Symbol, end: Node)
 {
     val transitionsFromStart = delta.computeIfAbsent(start, { mutableMapOf() })
-    val endNodes = transitionsFromStart.computeIfAbsent(label, { mutableListOf() })
+    val endNodes = transitionsFromStart.computeIfAbsent(symbol, { mutableListOf() })
     endNodes.add(end)
 }
 
@@ -215,7 +216,7 @@ fun BuchiAutomaton(glba: GeneralizedLabeledBuchiAutomaton): BuchiAutomaton {
     val nodes = mutableSetOf<Node>()
     val start = mutableSetOf<Node>()
     val finish = mutableSetOf<Node>()
-    val delta = mutableMapOf<Node, MutableMap<Label, MutableList<Node>>>()
+    val delta = mutableMapOf<Node, MutableMap<Symbol, MutableList<Node>>>()
 
     for (node in glba.states) {
         for (i in 1 .. glba.finish.size) {
@@ -249,13 +250,13 @@ fun BuchiAutomaton(glba: GeneralizedLabeledBuchiAutomaton): BuchiAutomaton {
         }
     }
 
-    return BuchiAutomaton(glba.sigma, nodes, start, finish, delta)
+    return BuchiAutomaton(glba.atomPropositions, nodes, start, finish, delta)
 }
 
 fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
     // Construct variables
-    val sigma: MutableSet<String> = mutableSetOf()
-    with (sigma) {
+    val atomPropositions: MutableSet<String> = mutableSetOf()
+    with (atomPropositions) {
         automaton.states
             .map { it.name }
             .forEach { add(it) }
@@ -284,9 +285,9 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
             start.add(from)
     }
 
-    val delta = mutableMapOf<Node, MutableMap<Label, MutableList<Node>>>()
+    val delta = mutableMapOf<Node, MutableMap<Symbol, MutableList<Node>>>()
     for ((enterState, state) in nodesByStateId.values) {
-        addTransition(delta, enterState, Label(Variable(state.name)), state)
+        addTransition(delta, enterState, Symbol(Variable(state.name)), state)
     }
     for (transition in automaton.transitions) {
         val automatonTransitionStart = automaton.states.find { transition.id in it.outgoing }
@@ -298,7 +299,7 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
 
         val eventVariable = Variable(transition.event)
         val stateVariable = Variable(from.name)
-        val eventLabel = Label(setOf(stateVariable, eventVariable))
+        val eventLabel = Symbol(setOf(stateVariable, eventVariable))
         val eventTransitionEnd: Node
         if (transition.actions.isEmpty()) {
             eventTransitionEnd = to
@@ -318,7 +319,7 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
                 transitionEnd = Node("temp_$action")
                 states.add(transitionEnd)
             }
-            val label = Label(setOf(
+            val label = Symbol(setOf(
                 stateVariable,
                 eventVariable,
                 actionVariable
@@ -328,5 +329,5 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
         }
     }
 
-    return BuchiAutomaton(sigma, states, start, states, delta)
+    return BuchiAutomaton(atomPropositions, states, start, states, delta)
 }
