@@ -280,7 +280,7 @@ fun toNNF(formula: LtlFormula): LtlFormula {
             is And -> Or(toNNF(Not(formula.sub.lhs)), toNNF(Not(formula.sub.rhs)))
             is Or -> And(toNNF(Not(formula.sub.lhs)), toNNF(Not(formula.sub.rhs)))
 
-            is Next -> Next(Not(formula.sub.sub))
+            is Next -> toNNF(Next(Not(formula.sub.sub)))
             is Future -> toNNF(Not(substituteFuture(formula.sub)))
             is Globally -> toNNF(Not(substituteGlobally(formula.sub)))
 
