@@ -25,7 +25,8 @@ mvn clean install
 * `U` - Until,
 * `R` - Release.
 
-Приоритет операторов нужно задавать явно с помощью скобок. [Antlr-граммматика.](https://github.com/wotopul/temporal-logic-verifier/blob/master/src/main/antlr4/org/wotopul/Ltl.g4)
+Операторы в порядке убывания приоритета: `!`, `X`, `F`, `G`, `U`, `R`, `&&`, `||`, `->`.
+Приоритет операторов можно задавать явно с помощью скобок. [Antlr-граммматика.](https://github.com/wotopul/temporal-logic-verifier/blob/master/src/main/antlr4/org/wotopul/Ltl.g4)
 
 # Формат автоматов
 

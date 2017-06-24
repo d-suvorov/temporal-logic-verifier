@@ -3,14 +3,14 @@ grammar Ltl;
 formula
     : '(' formula ')'              # parenthesis
     | '!' formula                  # negation
-    | lhs=formula '&&' rhs=formula # conjunction
-    | lhs=formula '||' rhs=formula # disjunction
-    | lhs=formula '->' rhs=formula # implication
     | 'X' formula                  # next
     | 'F' formula                  # future
     | 'G' formula                  # globally
     | lhs=formula 'U' rhs=formula  # until
     | lhs=formula 'R' rhs=formula  # release
+    | lhs=formula '&&' rhs=formula # conjunction
+    | lhs=formula '||' rhs=formula # disjunction
+    | lhs=formula '->' rhs=formula # implication
     | ID                           # variable
     | BooleanLiteral               # booleanLiteral
     ;
