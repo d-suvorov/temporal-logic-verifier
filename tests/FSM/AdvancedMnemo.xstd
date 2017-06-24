@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<diagram>
+  <name>AdvancedMnemo</name>
+  <data>
+    <Statemachine>
+      <event name="next_pack" comment="" />
+      <event name="repeat_cycle" comment="Повторить ещё раз" />
+      <variable decl="param int32 nPacks = 0;" />
+      <variable decl="param int32 nPasses = 3;" />
+      <variable decl="int32 iPass = 0;" />
+      <variable decl="int32 iPack = 0;" />
+      <variable decl="int32 nRepeat = 2;" />
+      <variable decl="int32 sPack = 10;" />
+      <autoreject>False</autoreject>
+    </Statemachine>
+  </data>
+  <widget id="0" type="State">
+    <attributes>
+      <name>Start</name>
+      <type>1</type>
+      <outgoing id="4" />
+    </attributes>
+  </widget>
+  <widget id="4" type="Transition">
+    <attributes>
+      <event name="init_event" comment="" />
+      <action name="LoadPack" comment="" synchro="1" />
+      <action name="SetConnectMode" comment="Show only second side (all in one card)" synchro="1" />
+      <action name="ShowFirstCard" comment="" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="1" type="State">
+    <attributes>
+      <name>Connect</name>
+      <type>0</type>
+      <incoming id="4" />
+      <incoming id="5" />
+      <incoming id="14" />
+      <incoming id="21" />
+      <outgoing id="5" />
+      <outgoing id="6" />
+    </attributes>
+  </widget>
+  <widget id="5" type="Transition">
+    <attributes>
+      <event name="correct" comment="Карточка угадана" />
+      <action name="GetNextCard" comment="" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="14" type="Transition">
+    <attributes>
+      <event name="next_pack" comment="" />
+      <action name="SetConnectMode" comment="" synchro="1" />
+      <action name="LoadPack" comment="" synchro="1" />
+      <action name="ShowFirstCard" comment="" synchro="1" />
+      <code>iPass = nPasses;
+iPack = iPack + 1;
+</code>
+      <guard>iPack &lt; nPacks</guard>
+    </attributes>
+  </widget>
+  <widget id="21" type="Transition">
+    <attributes>
+      <event name="next_pack" comment="" />
+      <code>iPass = nPasses;
+iPack = iPack + 1;
+</code>
+      <guard>iPack &lt; nPacks</guard>
+    </attributes>
+  </widget>
+  <widget id="6" type="Transition">
+    <attributes>
+      <event name="pack_is_over" comment="Пачка закончилась" />
+      <action name="SignalMnemoEnd" comment="" synchro="1" />
+      <action name="ShufflePack" comment="" synchro="1" />
+      <action name="SetNormalMode" comment="Show face and back sides" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="2" type="State">
+    <attributes>
+      <name>Repeat</name>
+      <type>0</type>
+      <incoming id="6" />
+      <incoming id="7" />
+      <incoming id="8" />
+      <incoming id="9" />
+      <incoming id="12" />
+      <outgoing id="7" />
+      <outgoing id="8" />
+      <outgoing id="9" />
+      <outgoing id="11" />
+    </attributes>
+  </widget>
+  <widget id="7" type="Transition">
+    <attributes>
+      <event name="correct" comment="Карточка угадана" />
+      <action name="GetNextCard" comment="" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="8" type="Transition">
+    <attributes>
+      <event name="wrong" comment="Карточка НЕугадана" />
+      <action name="ReturnCurCard" comment="" synchro="1" />
+      <action name="GetNextCard" comment="" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="9" type="Transition">
+    <attributes>
+      <event name="pack_is_over" comment="Пачка закончилась" />
+      <code>iPass = iPass  - 1;
+</code>
+      <guard>iPass &gt; 0</guard>
+    </attributes>
+  </widget>
+  <widget id="12" type="Transition">
+    <attributes>
+      <event name="repeat_cycle" comment="Повторить ещё раз" />
+      <action name="LoadPack" comment="" synchro="1" />
+      <code>iPass = 1;
+</code>
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="11" type="Transition">
+    <attributes>
+      <event name="pack_is_over" comment="Пачка закончилась" />
+      <action name="AskRepeatQuestion" comment="" synchro="1" />
+      <code />
+      <guard>iPass &lt;= 0</guard>
+    </attributes>
+  </widget>
+  <widget id="3" type="State">
+    <attributes>
+      <name>BackRepeat</name>
+      <type>0</type>
+      <incoming id="13" />
+      <incoming id="15" />
+      <incoming id="16" />
+      <incoming id="17" />
+      <incoming id="20" />
+      <outgoing id="15" />
+      <outgoing id="16" />
+      <outgoing id="17" />
+      <outgoing id="19" />
+    </attributes>
+  </widget>
+  <widget id="13" type="Transition">
+    <attributes>
+      <event name="turn_over" comment="Перевернуть карточку" />
+      <code>iPass = nPasses;
+</code>
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="15" type="Transition">
+    <attributes>
+      <event name="correct" comment="Карточка угадана" />
+      <action name="GetNextCard" comment="" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="16" type="Transition">
+    <attributes>
+      <event name="wrong" comment="Карточка НЕугадана" />
+      <action name="ReturnCurCard" comment="" synchro="1" />
+      <action name="GetNextCard" comment="" synchro="1" />
+      <code />
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="17" type="Transition">
+    <attributes>
+      <event name="repeat_cycle" comment="Повторить ещё раз" />
+      <code>iPass = iPass  - 1;
+</code>
+      <guard>iPass &gt; 0</guard>
+    </attributes>
+  </widget>
+  <widget id="20" type="Transition">
+    <attributes>
+      <event name="repeat_cycle" comment="Повторить ещё раз" />
+      <code>iPass = 1;
+</code>
+      <guard></guard>
+    </attributes>
+  </widget>
+  <widget id="19" type="Transition">
+    <attributes>
+      <event name="pack_is_over" comment="Пачка закончилась" />
+      <code />
+      <guard>iPass &lt;= 0</guard>
+    </attributes>
+  </widget>
+  <widget id="10" type="State">
+    <attributes>
+      <name>RepeatAnswer</name>
+      <type>0</type>
+      <incoming id="11" />
+      <outgoing id="12" />
+      <outgoing id="13" />
+      <outgoing id="14" />
+      <outgoing id="24" />
+    </attributes>
+  </widget>
+  <widget id="24" type="Transition">
+    <attributes>
+      <event name="next_pack" comment="" />
+      <action name="GoBack" comment="" synchro="1" />
+      <code />
+      <guard>iPack &gt;= nPacks</guard>
+    </attributes>
+  </widget>
+  <widget id="18" type="State">
+    <attributes>
+      <name>BackAnswer</name>
+      <type>0</type>
+      <incoming id="19" />
+      <outgoing id="20" />
+      <outgoing id="21" />
+      <outgoing id="23" />
+    </attributes>
+  </widget>
+  <widget id="23" type="Transition">
+    <attributes>
+      <event name="next_pack" comment="" />
+      <action name="GoBack" comment="" synchro="1" />
+      <code />
+      <guard>iPack &gt;= nPacks</guard>
+    </attributes>
+  </widget>
+  <widget id="22" type="State">
+    <attributes>
+      <name>End</name>
+      <type>2</type>
+      <incoming id="23" />
+      <incoming id="24" />
+    </attributes>
+  </widget>
+</diagram>

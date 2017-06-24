@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diagram>
+    <name>Simple</name>
+    <data>
+        <Statemachine>
+            <event name="*" comment=""/>
+            <autoreject>False</autoreject>
+        </Statemachine>
+    </data>
+    <widget id="0" type="State">
+        <attributes>
+            <name>A</name>
+            <type>1</type>
+            <outgoing id="4"/>
+            <outgoing id="6"/>
+        </attributes>
+    </widget>
+    <widget id="1" type="State">
+        <attributes>
+            <name>B</name>
+            <type>0</type>
+            <incoming id="4"/>
+            <incoming id="5"/>
+            <outgoing id="5"/>
+        </attributes>
+    </widget>
+    <widget id="2" type="State">
+        <attributes>
+            <name>C</name>
+            <type>0</type>
+            <incoming id="6"/>
+        </attributes>
+    </widget>
+
+    <widget id="4" type="Transition">
+        <attributes>
+            <event name="*" comment="No event"/>
+            <action name="!" comment="No event"/>
+            <code/>
+            <guard/>
+        </attributes>
+    </widget>
+    <widget id="5" type="Transition">
+        <attributes>
+            <event name="*" comment="No event"/>
+            <action name="!" comment="No event"/>
+            <code/>
+            <guard/>
+        </attributes>
+    </widget>
+    <widget id="6" type="Transition">
+        <attributes>
+            <event name="*" comment="No event"/>
+            <action name="!" comment="No event"/>
+            <code/>
+            <guard/>
+        </attributes>
+    </widget>
+
+</diagram>
