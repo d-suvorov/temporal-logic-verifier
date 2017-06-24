@@ -264,6 +264,9 @@ fun BuchiAutomaton(automaton: Automaton): BuchiAutomaton {
             .map { it.name }
             .forEach { add(it) }
         automaton.transitions
+            .map { it.event }
+            .forEach { add(it) }
+        automaton.transitions
             .flatMap { it.actions }
             .forEach { add(it) }
     }
