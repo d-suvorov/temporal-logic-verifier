@@ -235,7 +235,7 @@ fun BuchiAutomaton(glba: GeneralizedLabeledBuchiAutomaton): BuchiAutomaton {
         val label = glba.labels[state]
             ?: throw AssertionError("No label for $state")
         val toList: List<Node> = glba.delta[state]
-            ?: throw AssertionError("No transition for $state")
+            ?: listOf(state)
 
         for ((i, f) in glba.finish.withIndex()) {
             val fromCount = i + 1
